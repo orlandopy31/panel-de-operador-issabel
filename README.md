@@ -28,12 +28,22 @@ Panel de monitoreo de extensiones para Issabel 5 con 17 grupos configurables y u
 ## Instalación desde cero
 
 1. Copiar el repositorio al servidor (por Git o con el ZIP del proyecto) y entrar al directorio.
+
+  ```bash
+  cd /root
+  dnf install -y git
+  git clone https://github.com/orlandopy31/panel-de-operador-issabel.git
+  php -m | grep -i sqlite
+   ```
 2. Comprobar el servicio Asterisk, los archivos de ACL y menú de Issabel:
 
    ```bash
    test -f /var/www/db/acl.db && test -f /var/www/db/menu.db
    systemctl status asterisk --no-pager
    php -m | grep -i sqlite
+   cd /root/panel-de-operador-issabel
+   ls -lah
+   
    ```
 3. Revisar **antes de ejecutar** el instalador, especialmente `/var/www/html/modules/panel_lite` si ya contiene archivos. `install.sh` **reemplaza por completo** dicho directorio después de crear respaldo; no lo uses para una actualización habitual.
 4. Instalar como administrador del sistema:
