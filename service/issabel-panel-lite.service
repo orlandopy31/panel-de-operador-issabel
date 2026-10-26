@@ -1,0 +1,19 @@
+[Unit]
+Description=Issabel Panel Lite - monitor AMI compartido
+After=network.target asterisk.service mariadb.service
+Wants=asterisk.service
+
+[Service]
+Type=simple
+User=asterisk
+Group=asterisk
+ExecStart=/usr/bin/php /usr/local/libexec/issabel-panel-lite-daemon.php
+Restart=always
+RestartSec=2
+Nice=5
+MemoryMax=160M
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
