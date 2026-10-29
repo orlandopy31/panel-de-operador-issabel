@@ -34,7 +34,7 @@ function applyLayout(){
   root.querySelectorAll('.pl-group[data-group]').forEach(el=>{
     const settings=layout[el.dataset.group];
     if(!settings)return;
-    el.style.width=Math.min(settings.width,Math.max(260,el.parentElement.clientWidth||settings.width))+'px';
+    el.style.width=settings.width+'px';
     el.style.height=settings.height+'px';
   });
 }

@@ -16,35 +16,9 @@ function jsonOut($data, $status = 200) {
     exit;
 }
 
-function panelRole($username) {
-    if ($username === 'admin') return 'admin';
-    if ($username === '' || !class_exists('SQLite3')) return '';
-    $path = '/var/www/db/acl.db';
-    if (!is_readable($path)) return '';
-    try {
-        $db = new SQLite3($path, SQLITE3_OPEN_READONLY);
-        $query = "SELECT g.name FROM acl_user u
-                  JOIN acl_membership m ON m.id_user=u.id
-                  JOIN acl_group g ON g.id=m.id_group
-                  JOIN acl_group_permission gp ON gp.id_group=g.id
-                  JOIN acl_resource r ON r.id=gp.id_resource
-                  JOIN acl_action a ON a.id=gp.id_action
-                  WHERE u.name=:user AND r.name='panel_lite' AND a.name='access'";
-        $stmt = $db->prepare($query);
-        if (!$stmt) { $db->close(); return ''; }
-        $stmt->bindValue(':user', $username, SQLITE3_TEXT);
-        $res = $stmt->execute();
-        $role = '';
-        while ($res && ($row = $res->fetchArray(SQLITE3_ASSOC))) {
-            if (strcasecmp((string)$row['name'], 'Supervisores') === 0) $role = 'supervisor';
-            if (strcasecmp((string)$row['name'], 'Administradores') === 0) $role = 'admin';
-        }
-        $db->close();
-        return $role;
-    } catch (Throwable $e) { return ''; }
-}
+require_once __DIR__.'/auth.php';
 
-$role = panelRole($user);
+$role = panelLiteRole($user);
 if ($role === '') {
     jsonOut(['ok' => false, 'error' => 'No autorizado'], 403);
 }

@@ -14,16 +14,10 @@ function _moduleContent(&$smarty, $module_name)
         }
     }
 
-    $isAdmin = ($user === 'admin');
-    $canMove = $isAdmin;
-    if (!$canMove && $user !== '' && class_exists('SQLite3') && is_readable('/var/www/db/acl.db')) {
-        try {
-            $db = new SQLite3('/var/www/db/acl.db', SQLITE3_OPEN_READONLY);
-            $stmt = $db->prepare("SELECT 1 FROM acl_user u JOIN acl_membership m ON m.id_user=u.id JOIN acl_group g ON g.id=m.id_group JOIN acl_group_permission gp ON gp.id_group=g.id JOIN acl_resource r ON r.id=gp.id_resource JOIN acl_action a ON a.id=gp.id_action WHERE u.name=:u AND g.name='Supervisores' AND r.name='panel_lite' AND a.name='access' LIMIT 1");
-            if ($stmt) { $stmt->bindValue(':u',$user,SQLITE3_TEXT); $result=$stmt->execute(); $canMove=(bool)($result && $result->fetchArray(SQLITE3_NUM)); }
-            $db->close();
-        } catch (Throwable $e) { $canMove=false; }
-    }
+    require_once __DIR__.'/auth.php';
+    $role = panelLiteRole($user);
+    $isAdmin = ($role === 'admin');
+    $canMove = ($role === 'admin' || $role === 'supervisor');
     $csrf = htmlspecialchars($_SESSION['panel_lite_csrf'], ENT_QUOTES, 'UTF-8');
     $module = htmlspecialchars($module_name, ENT_QUOTES, 'UTF-8');
     $adminFlag = $isAdmin ? '1' : '0';
@@ -31,7 +25,7 @@ function _moduleContent(&$smarty, $module_name)
     $userKey = htmlspecialchars(hash('sha256', $user), ENT_QUOTES, 'UTF-8');
 
     return <<<HTML
-<link rel="stylesheet" href="modules/{$module}/themes/default/css/panel.css?v=20261026b">
+<link rel="stylesheet" href="modules/{$module}/themes/default/css/panel.css?v=20261029c">
 <div id="panel-lite-app" data-module="{$module}" data-admin="{$adminFlag}" data-can-move="{$moveFlag}" data-user-key="{$userKey}" data-csrf="{$csrf}">
     <div class="pl-toolbar">
         <div class="pl-title-wrap">
@@ -59,7 +53,7 @@ function _moduleContent(&$smarty, $module_name)
         <span id="pl-last-update"></span>
     </div>
 </div>
-<script src="modules/{$module}/themes/default/js/panel.js?v=20261026b"></script>
+<script src="modules/{$module}/themes/default/js/panel.js?v=20261029c"></script>
 HTML;
 }
 ?>

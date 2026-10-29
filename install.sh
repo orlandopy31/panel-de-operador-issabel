@@ -38,9 +38,10 @@ if [[ -z "$RID" ]]; then RID=$(sqlite3 "$ACL" "SELECT COALESCE(MAX(id),0)+1 FROM
 AID=$(sqlite3 "$ACL" "SELECT id FROM acl_action WHERE name='access' ORDER BY id LIMIT 1;")
 [[ -z "$AID" ]] && AID=1
 add_perm(){ local gid="$1"; [[ -z "$gid" ]] && return 0; local c; c=$(sqlite3 "$ACL" "SELECT COUNT(*) FROM acl_group_permission WHERE id_action=$AID AND id_group=$gid AND id_resource=$RID;"); if [[ "$c" == "0" ]]; then local id; id=$(sqlite3 "$ACL" "SELECT COALESCE(MAX(id),0)+1 FROM acl_group_permission;"); sqlite3 "$ACL" "INSERT INTO acl_group_permission(id,id_action,id_group,id_resource) VALUES($id,$AID,$gid,$RID);"; fi; }
-add_perm 1
-SGID=$(sqlite3 "$ACL" "SELECT id FROM acl_group WHERE name='Supervisores' LIMIT 1;")
-add_perm "$SGID"
+# Registrar acceso para todos los grupos administrativos y de supervisión existentes.
+while IFS= read -r gid; do
+  [[ -n "$gid" ]] && add_perm "$gid"
+done < <(sqlite3 "$ACL" "SELECT id FROM acl_group WHERE lower(trim(name)) IN ('administrador','administradores','administrator','administrators','admin','supervisor','supervisores','supervisors');")
 
 echo "[6/7] Instalando servicio"
 install -o root -g root -m 0644 "$SRC/service/issabel-panel-lite.service" /etc/systemd/system/issabel-panel-lite.service

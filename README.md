@@ -132,3 +132,7 @@ Si el primer comando solamente muestra `Supervisor` (singular), el código **no 
 ## Licencia y publicación
 
 **No se ha incorporado una licencia nueva**, porque primero debe confirmarse la titularidad y el permiso de redistribución del código original. Antes de hacer público el repositorio, revisar autoría, credenciales, configuraciones del cliente y dependencias. Se recomienda comenzar con un repositorio **privado**.
+
+## Corrección de permisos (29/10/2026)
+
+La actualización de roles reconoce usuarios de grupos Administrador(es) y Supervisor(es) además de la cuenta `admin`; el instalador y `actualizar_panel.sh` asignan acceso al recurso del panel. Ver [GUIA_ACTUALIZACION_Y_PULL_REQUEST.md](GUIA_ACTUALIZACION_Y_PULL_REQUEST.md) para actualizar sin afectar datos y crear el pull request de GitHub.
